@@ -20,7 +20,8 @@ app.get('/', async function(req, res){
 });
 
 async function ssr(myURL) {
-  url = myURL.href;
+  var url = myURL.href;
+  url = decodeURI(url);
 
   if (RENDER_CACHE.has(url)) {
     return {html: RENDER_CACHE.get(url), ttRenderMs: 0};
@@ -28,7 +29,13 @@ async function ssr(myURL) {
 
   const start = Date.now();
 
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch({
+    args: [
+      '--disable-web-security',
+      '--no-sandbox'
+    ],
+    headless: true,
+  });
   const page = await browser.newPage();
   var status;
   try {
